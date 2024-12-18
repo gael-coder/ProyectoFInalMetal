@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlar Metal Detectado</title>
+    <script src="https://api.particle.io/js/particle.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 32px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Control del Sensor de Metal</h1>
+    <p>Haz clic en el botón para activar</p>
+    <button id="toggleButton">Activar detector de metal</button>
+</div>
+
+<script>
+    // Reemplaza con tu token de acceso y el ID de tu dispositivo Particle
+    const accessToken = '79f854ee305ccaf94fe8473f2ff708ad38befaf5';
+    const deviceId = 'e00fce68ce6885f40a76bd65';
+
+    const toggleButton = document.getElementById('toggleButton');
+    let isMetalOn = false;
+
+    // Función para llamar al API de Particle
+    function toggleMetal() {
+        const command = isMetalOn ? 'off' : 'on';
+        
+        fetch(`https://api.particle.io/v1/devices/${deviceId}/metal?access_token=${accessToken}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                arg: command
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.return_value === 0) {
+                isMetalOn = !isMetalOn;
+                toggleButton.textContent =  'Activar Metal';
+            } else {
+                alert('Hubo un error al ejecutar el comando.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al ejecutar la API:', error);
+            alert('No se pudo conectar al dispositivo.');
+        });
+    }
+
+    // Añadir evento de clic al botón
+    toggleButton.addEventListener('click', toggleMetal);
+</script>
+
+</body>
+</html>
